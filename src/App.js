@@ -1,23 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import Pregunta from "./components/Pregunta";
+import Formulario from "./components/Formulario";
+import Listado from "./components/Listado";
+import ControlPresupuesto from "./components/ControlPresupuesto";
 
 function App() {
+
+  const [presupuesto, guardarPresupuesto] = useState(0);
+  const [restante, guardarRestante] = useState(0);
+  const [gastos, guardarGasto] = useState([]);
+  const [gasto, agregarNuevoGasto] = useState({});
+  const [gastoCreado, isGastoCreado] = useState(false);
+
+  useEffect(() => {
+    if (gastoCreado) {      
+        guardarGasto([
+          ...gastos,
+          gasto
+        ])    
+
+        const presupuestoRestante = restante - gasto.cantidad;
+        guardarRestante(presupuestoRestante);
+    }
+
+    isGastoCreado(false);
+
+  }, [gasto, gastoCreado, presupuesto, restante, gastos])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <div className="container">
+      <header>
+        <h1> Gasto semanal</h1>
+
+        <div className="contenido-principal contenido">
+
+        {
+            !presupuesto
+            ? 
+            (
+              <Pregunta 
+                guardarPresupuesto={guardarPresupuesto}
+                guardarRestante={guardarRestante}
+              />              
+            )
+            :
+            (
+              <div className="row">
+                <div className="one-half column">
+                  <Formulario
+                    agregarNuevoGasto={agregarNuevoGasto}
+                    isGastoCreado={isGastoCreado}
+                  />
+                </div>
+    
+                <div className="one-half column">
+                  <Listado gastos={gastos}/>
+
+                  <ControlPresupuesto
+                    presupuesto={presupuesto}
+                    restante={restante}
+                  />
+                </div>
+              </div>              
+            )
+        }          
+        </div>
+
+
       </header>
     </div>
   );
